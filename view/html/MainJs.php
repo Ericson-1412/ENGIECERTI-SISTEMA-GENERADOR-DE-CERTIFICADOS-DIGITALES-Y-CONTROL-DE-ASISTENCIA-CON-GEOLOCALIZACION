@@ -13,5 +13,6 @@
 <script src="../../public/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>
 <script src="../../public/modules/jquery-ui/jquery-ui.min.js"></script>
 <script src="../../public/js/page/modules-datatables.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 

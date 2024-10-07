@@ -46,26 +46,34 @@
             $conectar=parent::conexion();
             parent::set_names();
             $sql="SELECT 
-                td_curso_usuario.curd_id,
-                tm_curso.cur_id,
-                tm_curso.cur_nom,
-                tm_curso.cur_descrip,
-                tm_curso.cur_fechini,
-                tm_curso.cur_fechfin,
-                tm_usuario.usu_id,
-                tm_usuario.usu_nom,
-                tm_usuario.usu_apep,
-                tm_usuario.usu_apem,
-                tm_instructor.inst_id,
-                tm_instructor.inst_nom,
-                tm_instructor.inst_apep,
-                tm_instructor.inst_apem
-                FROM `td_curso_usuario` INNER JOIN 
-                tm_curso ON td_curso_usuario.curd_id = tm_curso.cur_id INNER JOIN
-                tm_usuario ON td_curso_usuario.usu_id = tm_usuario.usu_id INNER JOIN
-                tm_instructor ON tm_curso.inst_id = tm_instructor.inst_id
+                    td_curso_usuario.curd_id, 
+                    tm_curso.cur_id, 
+                    tm_curso.cur_nom, 
+                    tm_curso.cur_descrip, 
+                    tm_curso.cur_fechini, 
+                    tm_curso.cur_fechfin, 
+                    tm_usuario.usu_id, 
+                    tm_usuario.usu_nom, 
+                    tm_usuario.usu_apep, 
+                    tm_instructor.inst_id, 
+                    tm_instructor.inst_nom, 
+                    tm_instructor.inst_apep 
+                FROM 
+                    td_curso_usuario 
+                INNER JOIN 
+                    tm_curso 
+                ON 
+                    td_curso_usuario.cur_id = tm_curso.cur_id 
+                INNER JOIN 
+                    tm_usuario 
+                ON 
+                    td_curso_usuario.usu_id = tm_usuario.usu_id 
+                INNER JOIN 
+                    tm_instructor 
+                ON 
+                    tm_curso.inst_id = tm_instructor.inst_id 
                 WHERE 
-                td_curso_usuario.usu_id = ?";
+                    td_curso_usuario.usu_id = ?";
             $sql=$conectar->prepare($sql);
             $sql->bindValue(1, $usu_id);
             $sql->execute();
@@ -76,26 +84,34 @@
             $conectar=parent::conexion();
             parent::set_names();
             $sql="SELECT 
-                td_curso_usuario.curd_id,
-                tm_curso.cur_id,
-                tm_curso.cur_nom,
-                tm_curso.cur_descrip,
-                tm_curso.cur_fechini,
-                tm_curso.cur_fechfin,
-                tm_usuario.usu_id,
-                tm_usuario.usu_nom,
-                tm_usuario.usu_apep,
-                tm_usuario.usu_apem,
-                tm_instructor.inst_id,
-                tm_instructor.inst_nom,
-                tm_instructor.inst_apep,
-                tm_instructor.inst_apem
-                FROM `td_curso_usuario` INNER JOIN 
-                tm_curso ON td_curso_usuario.curd_id = tm_curso.cur_id INNER JOIN
-                tm_usuario ON td_curso_usuario.usu_id = tm_usuario.usu_id INNER JOIN
-                tm_instructor ON tm_curso.inst_id = tm_instructor.inst_id
+                    td_curso_usuario.curd_id, 
+                    tm_curso.cur_id, 
+                    tm_curso.cur_nom, 
+                    tm_curso.cur_descrip, 
+                    tm_curso.cur_fechini, 
+                    tm_curso.cur_fechfin, 
+                    tm_usuario.usu_id, 
+                    tm_usuario.usu_nom, 
+                    tm_usuario.usu_apep, 
+                    tm_instructor.inst_id, 
+                    tm_instructor.inst_nom, 
+                    tm_instructor.inst_apep 
+                FROM 
+                    td_curso_usuario 
+                INNER JOIN 
+                    tm_curso 
+                ON 
+                    td_curso_usuario.cur_id = tm_curso.cur_id 
+                INNER JOIN 
+                    tm_usuario 
+                ON 
+                    td_curso_usuario.usu_id = tm_usuario.usu_id 
+                INNER JOIN 
+                    tm_instructor 
+                ON 
+                    tm_curso.inst_id = tm_instructor.inst_id 
                 WHERE 
-                td_curso_usuario.usu_id = ?
+                    td_curso_usuario.usu_id = ?
                 LIMIT 10";
             $sql=$conectar->prepare($sql);
             $sql->bindValue(1, $usu_id);
@@ -103,11 +119,10 @@
             return $resultado=$sql->fetchAll();
         }
 
-        //mostrar todos los datos de un curso por su id de detalle
         public function get_curso_x_id_detalle($curd_id){
-            $conectar=parent::conexion();
+            $conectar = parent::conexion();
             parent::set_names();
-            $sql="SELECT 
+            $sql = "SELECT 
                 td_curso_usuario.curd_id,
                 tm_curso.cur_id,
                 tm_curso.cur_nom,
@@ -122,16 +137,17 @@
                 tm_instructor.inst_nom,
                 tm_instructor.inst_apep,
                 tm_instructor.inst_apem
-                FROM `td_curso_usuario` INNER JOIN 
-                tm_curso ON td_curso_usuario.curd_id = tm_curso.cur_id INNER JOIN
-                tm_usuario ON td_curso_usuario.usu_id = tm_usuario.usu_id INNER JOIN
-                tm_instructor ON tm_curso.inst_id = tm_instructor.inst_id
-                WHERE 
-                td_curso_usuario.curd_id = ?";
-            $sql=$conectar->prepare($sql);
+            FROM td_curso_usuario 
+            INNER JOIN tm_curso ON td_curso_usuario.cur_id = tm_curso.cur_id 
+            INNER JOIN tm_usuario ON td_curso_usuario.usu_id = tm_usuario.usu_id 
+            INNER JOIN tm_instructor ON tm_curso.inst_id = tm_instructor.inst_id
+            WHERE td_curso_usuario.curd_id = ?";
+            
+            $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $curd_id);
             $sql->execute();
-            return $resultado=$sql->fetchAll();
+            
+            return $resultado = $sql->fetchAll();
         }
 
         //cantidad de cursos por usuario
@@ -141,6 +157,42 @@
             $sql="SELECT COUNT(*) AS total FROM td_curso_usuario WHERE usu_id=?";
             $sql=$conectar->prepare($sql);
             $sql->bindValue(1, $usu_id);
+            $sql->execute();
+            return $resultado=$sql->fetchAll();
+        }
+
+        //mostrar los datos del usuario segun el ID
+        public function get_usuario_x_id($usu_id){
+            $conectar=parent::conexion();
+            parent::set_names();
+            $sql="SELECT * FROM tm_usuario WHERE est=1 AND usu_id=?";
+            $sql=$conectar->prepare($sql);
+            $sql->bindValue(1, $usu_id);
+            $sql->execute();
+            return $resultado=$sql->fetchAll();
+        }
+
+        public function update_usuario_perfil($usu_id,$usu_nom,$usu_apep,$usu_apem,$usu_pass,$usu_sex,$usu_telf){
+            $conectar=parent::conexion();
+            parent::set_names();
+            $sql="UPDATE tm_usuario
+                SET
+                    usu_nom=?,
+                    usu_apep=?,
+                    usu_apem=?,
+                    usu_pass=?,
+                    usu_sex=?,
+                    usu_telf=?
+                WHERE
+                    usu_id=?";
+            $sql=$conectar->prepare($sql);
+            $sql->bindValue(1, $usu_nom);
+            $sql->bindValue(2, $usu_apep);
+            $sql->bindValue(3, $usu_apem);
+            $sql->bindValue(4, $usu_pass);
+            $sql->bindValue(5, $usu_sex);
+            $sql->bindValue(6, $usu_telf);
+            $sql->bindValue(7, $usu_id);
             $sql->execute();
             return $resultado=$sql->fetchAll();
         }
