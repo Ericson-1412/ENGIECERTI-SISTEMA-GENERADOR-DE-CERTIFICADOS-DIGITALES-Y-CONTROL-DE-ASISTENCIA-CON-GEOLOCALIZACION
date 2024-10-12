@@ -4,10 +4,10 @@
     require_once("../config/conexion.php");
 
     //llamando a la clase
-    require_once("../models/Curso.php");
+    require_once("../models/Categoria.php");
 
     //inicializando clase
-    $curso = new Curso();
+    $categoria = new Categoria();
 
     //opcion de solicitud de controller
     switch ($_GET["op"]) {
@@ -47,14 +47,15 @@
         case "listar":
             $datos = $curso->get_curso();
             $data = array();
+    
             foreach ($datos as $row) {
                 $sub_array = array();
                 // Agregar cada columna al array en lugar de sobrescribirlo
-                $sub_array[] = $row["cat_nom"];
+                $sub_array[] = $row["cat_id"];
                 $sub_array[] = $row["cur_nom"];
                 $sub_array[] = $row["cur_fechini"];
                 $sub_array[] = $row["cur_fechfin"];
-                $sub_array[] = $row["inst_nom"] ." ". $row["inst_apep"] ." ". $row["inst_apem"];
+                $sub_array[] = $row["inst_id"];
                 $sub_array[] = '<button type="button" onClick="editar('.$row["cur_id"].');" id="'.$row["cur_id"].'" class="btn btn-outline-warning btn-icon"><i class="fa fa-edit"></i></button>';
                 $sub_array[] = '<button type="button" onClick="eliminar('.$row["cur_id"].');" id="'.$row["cur_id"].'" class="btn btn-outline-danger btn-icon"><i class="fa fa-times"></i></button>';
 
@@ -70,6 +71,17 @@
             );
             
             echo json_encode($results);
+            break;
+        
+        case "combo":
+            $datos = $categoria->get_categoria();
+            if (is_array($datos) == true and count($datos) > 0) {
+                $html = "<option value='' disabled selected>Seleccione</option>";
+                foreach ($datos as $row) {
+                    $html .= "<option value='".$row['cat_id']."'>".$row['cat_nom']."</option>";
+                }
+            }
+            echo $html;
             break;
     }
 ?>
