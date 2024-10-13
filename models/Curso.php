@@ -91,5 +91,35 @@
             $sql->execute();
             return $resultado=$sql->fetchAll();
         }
+
+        public function delete_curso_usuario($curd_id){
+            $conectar=parent::conexion();
+            parent::set_names();
+            $sql="UPDATE td_curso_usuario
+                SET
+                    est = 0
+                WHERE
+                    curd_id = ?";
+            $sql=$conectar->prepare($sql);
+            $sql->bindValue(1, $curd_id);
+            $sql->execute();
+            return $resultado=$sql->fetchAll();
+        }
+
+        /*TODO: Insert Curso por Usuario */
+        public function insert_curso_usuario($cur_id,$usu_id){
+            $conectar= parent::conexion();
+            parent::set_names();
+            $sql="INSERT INTO td_curso_usuario (curd_id,cur_id,usu_id,fech_crea,est) VALUES (NULL,?,?,now(),1);";
+            $sql=$conectar->prepare($sql);
+            $sql->bindValue(1, $cur_id);
+            $sql->bindValue(2, $usu_id);
+            $sql->execute();
+
+            $sql1="select last_insert_id() as 'curd_id'";
+            $sql1=$conectar->prepare($sql1);
+            $sql1->execute();
+            return $resultado=$sql1->fetch(pdo::FETCH_ASSOC);
+        }
     }
 ?>

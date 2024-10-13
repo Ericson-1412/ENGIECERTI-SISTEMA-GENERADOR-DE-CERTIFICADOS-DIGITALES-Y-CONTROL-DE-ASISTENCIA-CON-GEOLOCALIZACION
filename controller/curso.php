@@ -71,5 +71,26 @@
             
             echo json_encode($results);
             break;
+
+        case "combo":
+            $datos=$curso->get_curso();
+            if(is_array($datos)==true and count($datos)>0){
+                $html= " <option label='Seleccione'></option>";
+                foreach($datos as $row){
+                    $html.= "<option value='".$row['cur_id']."'>".$row['cur_nom']."</option>";
+                }
+                echo $html;
+            }
+            break;
+        
+        case "eliminar_curso_usuario":
+            $curso->delete_curso_usuario($_POST["curd_id"]);
+            break;
+        case "insert_curso_usuario":
+            $datos = explode(',', $_POST['usu_id']);
+            foreach ($datos as $row) {
+                $curso->insert_curso_usuario($_POST["cur_id"], $row);
+            }
+            break;
     }
 ?>
