@@ -25,6 +25,8 @@
                     <span>Mnt. Categoria</span></a></li>
                     <li><a class="nav-link" href="../AdminDetalleCertificado/"><i class="fas fa-book"></i> 
                     <span>Detalle Certificado</span></a></li>
+                    <li><a class="nav-link" href="../AdminAsistencia/index.php"><i class="fas fa-calendar-check"></i> 
+                    <span>Control de Asistencia</span></a></li>
                 <?php
             }
         ?>
