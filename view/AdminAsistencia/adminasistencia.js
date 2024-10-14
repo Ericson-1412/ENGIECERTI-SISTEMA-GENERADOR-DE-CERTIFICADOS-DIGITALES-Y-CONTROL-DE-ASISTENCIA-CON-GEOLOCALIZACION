@@ -30,7 +30,36 @@ function guardaryeditar(e) {
 }
 
 
+function editar(id_asistencia) {
+    $.post("../../controller/asistencia.php?op=mostrar", { id_asistencia: id_asistencia }, function (data) {
+        data = JSON.parse(data);
+        console.log(data);
+        $('#id_asistencia').val(data.id_asistencia);  // ID de la asistencia
+        $('#usu_id').val(data.usu_id);                // ID del usuario
+        $('#fecha').val(data.fecha);                  // Fecha de la asistencia
+        $('#hora').val(data.hora);                    // Hora de la asistencia
+        $('#latitud').val(data.latitud);              // Latitud
+        $('#longitud').val(data.longitud);            // Longitud
+        // Si la foto está almacenada, podrías mostrarla de esta manera:
+        $('#preview_foto').attr('src', '../public/fotos_asistencia/' + data.foto);
+    });
+    $('#lbltitulo').html('Editar Asistencia');
+    $("#modalmantenimiento").modal('show');
+}
+
+
 $(document).ready(function() {
+
+    // Capturar la imagen cuando se presiona el botón
+    $("#capture-button").click(function (e) {
+        e.preventDefault();  // Evita que el formulario se envíe
+        const canvasContext = $("canvas")[0].getContext("2d");
+        canvasContext.drawImage($("video")[0], 0, 0, 320, 240);
+        const dataUrl = $("canvas")[0].toDataURL("image/png");
+
+        // Ahora, puedes manejar la imagen capturada
+        console.log("Foto capturada:", dataUrl);
+    });
 
     $.post("../../controller/asistencia.php?op=combo", function (data) {
         $('#usu_id').html(data);
@@ -117,8 +146,9 @@ function eliminar(id_asistencia) {
 
 function nuevo() {
     $('#lbltitulo').html('Nuevo Registro de Asistencia');
-    $("#asistencia_form")[0].reset(); // Restablecer el formulario de asistencia
-    $("#modalmantenimiento").modal('show'); // Mostrar el modal de mantenimiento
+    $("#asistencia_form")[0].reset(); // Limpiar el formulario
+    $(".editar-only").hide(); // Ocultar los campos de edición
+    $("#modalmantenimiento").modal('show'); // Mostrar el modal
 }
 
 init();

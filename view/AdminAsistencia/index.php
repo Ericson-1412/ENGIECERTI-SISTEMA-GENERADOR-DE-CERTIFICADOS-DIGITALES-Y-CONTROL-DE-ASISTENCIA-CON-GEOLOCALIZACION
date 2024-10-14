@@ -63,6 +63,7 @@
                                                             <th class="wd-15p">Fecha</th>
                                                             <th class="wd-15p">Hora</th>
                                                             <th class="wd-20p">Ubicación</th>
+                                                            <th class="wd-20p">Foto</th>
                                                             <th class="wd-10p"></th>
                                                             <th class="wd-10p"></th>
                                                         </tr>

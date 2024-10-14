@@ -17,6 +17,7 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["fecha"]; // Fecha de asistencia
             $sub_array[] = $row["hora"]; // Hora de asistencia
             $sub_array[] = $row["latitud"] . ', ' . $row["longitud"]; // Ubicación
+            $sub_array[] = '<img src="../../public/fotos_asistencia/'.$row["foto"].'" width="50" height="50" class="img-thumbnail">'; // Mostrar la foto
             $sub_array[] = '<button type="button" onClick="editar('.$row["id_asistencia"].');" id="'.$row["id_asistencia"].'" class="btn btn-outline-warning btn-icon"><i class="fa fa-edit"></i></button>';
             $sub_array[] = '<button type="button" onClick="eliminar('.$row["id_asistencia"].');" id="'.$row["id_asistencia"].'" class="btn btn-outline-danger btn-icon"><i class="fa fa-times"></i></button>';
     
@@ -59,20 +60,21 @@ switch ($_GET["op"]) {
         break;
     
     case "mostrar":
-        $datos = $asistencia->get_asistencia_id($_POST["id_asistencia"]);
-        if(is_array($datos) == true and count($datos) > 0){
-            foreach($datos as $row){
-                $output["id_asistencia"] = $row["id_asistencia"];
-                $output["usu_id"] = $row["usu_id"];
-                $output["fecha"] = $row["fecha"];
-                $output["hora"] = $row["hora"];
-                 $output["foto"] = $row["foto"];
-                $output["latitud"] = $row["latitud"];
-                $output["longitud"] = $row["longitud"];
-            }
-            echo json_encode($output);
+    $datos = $asistencia->get_asistencia_id($_POST["id_asistencia"]);
+    if (is_array($datos) == true and count($datos) > 0) {
+        foreach ($datos as $row) {
+            $output["id_asistencia"] = $row["id_asistencia"];
+            $output["usu_id"] = $row["usu_id"];
+            $output["fecha"] = $row["fecha"];
+            $output["hora"] = $row["hora"];
+            $output["latitud"] = $row["latitud"];
+            $output["longitud"] = $row["longitud"];
+            // También la foto si es necesario
+            $output["foto"] = $row["foto"];
         }
-        break;
+        echo json_encode($output);
+    }
+    break;
 
     case "eliminar":
         $asistencia->delete_asistencia($_POST["id_asistencia"]);

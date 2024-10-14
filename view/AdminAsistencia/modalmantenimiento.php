@@ -14,25 +14,21 @@
                                 <input class="form-control" id="fecha" type="date" name="fecha" required />
                             </div>
                         </div>
-
-                        <!-- Añadir un margen en la parte superior para separar la sección de la cámara -->
-                        <div class="form-group mt-4">
-                            <label>Capturar Foto:</label>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <!-- Botón de captura alineado a la izquierda -->
-                                <button id="capture-button" class="btn btn-primary">Tomar Foto</button>
-                                
-                                <!-- Espacio de video a la derecha con margen izquierdo para separación -->
-                                <div class="ml-4">
-                                    <video autoplay width="320" height="240"></video>
-                                    <canvas style="display:none;"></canvas> <!-- Canvas oculto para capturar la foto -->
-                                </div>
-                            </div>
+                        <br>
+                        <div class="col-md-12 center">
+                            <video id="theVideo" autoplay muted></video>
+                            <canvas id="theCanvas"></canvas> <!-- Mantener oculto el canvas -->
+                        </div>
+                        <div class="d-grid gap-2 d-md-block">
+                            <button type="button" class="btn btn-primary" id="btnCapture">Tomar foto</button>
+                            <button type="button" class="btn btn-primary" id="btnDownloadImage" disabled>Descargar Imagen</button>
+                            <button type="button" class="btn btn-primary" id="btnSendImageToServer" disabled>Guardar Imagen</button>
+                            <button type="button" class="btn btn-primary" id="btnStartCamera">Iniciar Cámara</button>          
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" name="action" value="add" class="btn btn-outline-primary tx-11 tx-uppercase pd-y-12 pd-x-25 tx-mont tx-medium">
+                    <button name="action" onclick="registrardetalle()" class="btn btn-outline-primary tx-11 tx-uppercase pd-y-12 pd-x-25 tx-mont tx-medium">
                         <i class="fa fa-check"></i> Guardar
                     </button>
                     <button type="button" class="btn btn-outline-secondary tx-11 tx-uppercase pd-y-12 pd-x-25 tx-mont tx-medium" 
@@ -44,28 +40,93 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    const video = document.querySelector('video');
-    const captureButton = document.querySelector('#capture-button');
-    const canvas = document.querySelector('canvas');
-    const context = canvas.getContext('2d');
+    const videoWidth = 420;
+    const videoHeight = 320;
+    const videoTag = document.getElementById("theVideo");
+    const canvasTag = document.getElementById("theCanvas");
+    const btnCapture = document.getElementById("btnCapture");
+    const btnDownloadImage = document.getElementById("btnDownloadImage");
+    const btnSendImageToServer = document.getElementById("btnSendImageToServer");
+    const btnStartCamera = document.getElementById("btnStartCamera");
 
-    // Solicitar acceso a la cámara
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            video.srcObject = stream;
-        })
-        .catch(error => {
-            console.error('Error al acceder a la cámara: ', error);
+    let cameraActive = false; // Variable para rastrear el estado de la cámara
+
+    // Establecer estado inicial de los botones
+    btnCapture.disabled = true;
+    btnDownloadImage.disabled = true;
+    btnSendImageToServer.disabled = true;
+
+    // Set video and canvas attributes
+    videoTag.setAttribute("width", videoWidth);
+    videoTag.setAttribute("height", videoHeight);
+    canvasTag.setAttribute("width", videoWidth);
+    canvasTag.setAttribute("height", videoHeight);
+
+    btnStartCamera.addEventListener("click", async () => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { width: videoWidth, height: videoHeight },
         });
+        videoTag.srcObject = stream;
+        btnStartCamera.disabled = true;
 
-    // Capturar la imagen cuando se presiona el botón
-    captureButton.addEventListener('click', function() {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/png');
-
-        // Aquí puedes enviar la imagen capturada al servidor
-        console.log('Foto capturada: ', dataUrl);
+        // Habilitar los botones cuando la cámara está activa
+        cameraActive = true;
+        btnCapture.disabled = false;
+    } catch (error) {
+        console.log("error", error);
+    }
     });
+
+    // Capture button..
+    btnCapture.addEventListener("click", () => {
+    const canvasContext = canvasTag.getContext("2d");
+    canvasContext.drawImage(videoTag, 0, 0, videoWidth, videoHeight);
+    btnDownloadImage.disabled = false;
+    btnSendImageToServer.disabled = false;
+    });
+
+    /**
+     * Boton para forzar la descarga de la imagen
+     */
+    btnDownloadImage.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = "capturedImage.png";
+    link.href = canvasTag.toDataURL();
+    link.click();
+    });
+
+    /**
+     *Enviar imagen al serrvidor para se guardada
+    */
+    btnSendImageToServer.addEventListener("click", async () => {
+    const dataURL = canvasTag.toDataURL();  // Convertir la imagen a formato Data URL
+    const blob = await dataURLtoBlob(dataURL);  // Convertir Data URL a Blob para el envío
+    const data = new FormData();  // Crear FormData para enviar la imagen al servidor
+    data.append("capturedImage", blob, "capturedImage.png");
+
+    try {
+        const response = await axios.post("../../controller/upload_foto.php", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert(response.data);  // Mostrar el mensaje del servidor
+    } catch (error) {
+        console.error("Error al enviar la imagen:", error);  // Mostrar cualquier error en la consola
+    }
+    });
+
+    async function dataURLtoBlob(dataURL) {
+    const arr = dataURL.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    const n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    for (let i = 0; i < n; i++) {
+        u8arr[i] = bstr.charCodeAt(i);
+    }
+    return new Blob([u8arr], { type: mime });
+    }
 </script>
