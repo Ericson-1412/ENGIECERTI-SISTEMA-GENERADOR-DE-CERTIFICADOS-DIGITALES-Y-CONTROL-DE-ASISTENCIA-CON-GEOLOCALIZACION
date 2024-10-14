@@ -37,7 +37,7 @@
                             <div class="form-row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label class="form-control-label">Cursos: <span class="tx-danger">*</span></label>
+                                        <label class="form-control-label">Usuarios: <span class="tx-danger">*</span></label>
                                         <select class="form-control select2" style="width:100%" name="usu_id" id="usu_id" data-placeholder="Seleccione">
                                             <option label="Seleccione"></option>
 

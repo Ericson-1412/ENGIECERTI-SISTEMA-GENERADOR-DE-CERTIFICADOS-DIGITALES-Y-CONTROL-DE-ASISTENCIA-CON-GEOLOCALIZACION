@@ -1,23 +1,24 @@
 <?php
 class Asistencia extends Conectar {
     
-    public function insert_asistencia($usu_id, $fecha, $foto, $latitud, $longitud) {
+    public function insert_asistencia($usu_id, $fecha, $foto, $latitud, $longitud, $hora) {
         $conectar = parent::conexion();
         parent::set_names();
-        
-        $sql = "INSERT INTO asistencia (asistencia_id, usu_id, fecha, hora, foto, latitud, longitud, est) 
-                VALUES (NULL, ?, ?, now(), ?, ?, ?, '1');";
+    
+        $sql = "INSERT INTO asistencia (usu_id, fecha, foto, latitud, longitud, hora, est)
+            VALUES (?, ?, ?, ?, ?, ?, 1)";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_id);
         $sql->bindValue(2, $fecha);
         $sql->bindValue(3, $foto);
-        $sql->bindValue(4, $latitud); 
-        $sql->bindValue(5, $longitud); 
+        $sql->bindValue(4, $latitud);
+        $sql->bindValue(5, $longitud);
+        $sql->bindValue(6, $hora);
         $sql->execute();
         return $resultado=$sql->fetchAll();
     }
 
-    public function update_asistencia($id_asistencia, $usu_id, $fecha, $foto, $latitud, $longitud) {
+    public function update_asistencia($id_asistencia, $usu_id, $fecha, $foto, $latitud, $longitud, $hora) {
         $conectar = parent::conexion();
         parent::set_names();
         
@@ -27,7 +28,8 @@ class Asistencia extends Conectar {
                     fecha = ?,
                     foto = ?,
                     latitud = ?,
-                    longitud = ?
+                    longitud = ?,
+                    hora = ?
                 WHERE
                     id_asistencia = ?";
         
@@ -37,7 +39,8 @@ class Asistencia extends Conectar {
         $sql->bindValue(3, $foto);
         $sql->bindValue(4, $latitud);
         $sql->bindValue(5, $longitud);
-        $sql->bindValue(6, $id_asistencia);
+        $sql->bindValue(6, $hora); // Asegúrate de incluir la hora correctamente
+        $sql->bindValue(7, $id_asistencia); // Corregir el índice de la última variable
         $sql->execute();
         return $resultado=$sql->fetchAll();
     }

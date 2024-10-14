@@ -4,7 +4,7 @@
             <div class="modal-header pd-y-20 pd-x-25">
                 <h6 id="lbltitulo" class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Nuevo Registro</h6>
             </div>
-            <form method="post" id="asistencia_form">
+            <form method="post" id="asistencia_form" enctype="multipart/form-data">
                 <div class="modal-body pd-25">
                     <input type="hidden" name="id_asistencia" id="id_asistencia" />
                     <div class="container">
@@ -25,10 +25,28 @@
                             <button type="button" class="btn btn-primary" id="btnSendImageToServer" disabled>Guardar Imagen</button>
                             <button type="button" class="btn btn-primary" id="btnStartCamera">Iniciar Cámara</button>          
                         </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="hora">Hora:</label>
+                                <input class="form-control" id="hora" name="hora" readonly>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="latitud">Latitud:</label>
+                                <input class="form-control" id="latitud" name="latitud" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="longitud">Longitud:</label>
+                                <input class="form-control" id="longitud" name="longitud" readonly>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button name="action" onclick="registrardetalle()" class="btn btn-outline-primary tx-11 tx-uppercase pd-y-12 pd-x-25 tx-mont tx-medium">
+                    <button type="submit" name="action" value="add" class="btn btn-outline-primary tx-11 tx-uppercase pd-y-12 pd-x-25 tx-mont tx-medium">
                         <i class="fa fa-check"></i> Guardar
                     </button>
                     <button type="button" class="btn btn-outline-secondary tx-11 tx-uppercase pd-y-12 pd-x-25 tx-mont tx-medium" 
@@ -58,75 +76,92 @@
     btnDownloadImage.disabled = true;
     btnSendImageToServer.disabled = true;
 
-    // Set video and canvas attributes
+    // Configurar los atributos de video y canvas
     videoTag.setAttribute("width", videoWidth);
     videoTag.setAttribute("height", videoHeight);
     canvasTag.setAttribute("width", videoWidth);
     canvasTag.setAttribute("height", videoHeight);
 
+    // Evento para iniciar la cámara
     btnStartCamera.addEventListener("click", async () => {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { width: videoWidth, height: videoHeight },
-        });
-        videoTag.srcObject = stream;
-        btnStartCamera.disabled = true;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: { width: videoWidth, height: videoHeight },
+            });
+            videoTag.srcObject = stream;
+            btnStartCamera.disabled = true;
 
-        // Habilitar los botones cuando la cámara está activa
-        cameraActive = true;
-        btnCapture.disabled = false;
-    } catch (error) {
-        console.log("error", error);
-    }
+            // Habilitar el botón de captura cuando la cámara esté activa
+            cameraActive = true;
+            btnCapture.disabled = false;
+        } catch (error) {
+            console.log("Error al iniciar la cámara:", error);
+        }
     });
 
-    // Capture button..
+    // Evento para capturar la imagen y obtener la ubicación
     btnCapture.addEventListener("click", () => {
     const canvasContext = canvasTag.getContext("2d");
     canvasContext.drawImage(videoTag, 0, 0, videoWidth, videoHeight);
     btnDownloadImage.disabled = false;
     btnSendImageToServer.disabled = false;
-    });
 
-    /**
-     * Boton para forzar la descarga de la imagen
-     */
+    // Obtener la ubicación cuando se captura la imagen
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Mostrar las coordenadas en los campos
+            document.getElementById("latitud").value = lat;
+            document.getElementById("longitud").value = lon;
+        }, function (error) {
+            console.error("Error al obtener la ubicación:", error);
+        });
+    } else {
+        alert("Geolocalización no soportada por este navegador.");
+    }
+
+    // Obtener la hora actual y rellenar el campo
+    const now = new Date();
+    const currentTime = now.toTimeString().split(" ")[0]; // Obtener solo la hora (HH:mm:ss)
+    document.getElementById("hora").value = currentTime;
+    
+    });
+    // Botón para forzar la descarga de la imagen
     btnDownloadImage.addEventListener("click", () => {
-    const link = document.createElement("a");
-    link.download = "capturedImage.png";
-    link.href = canvasTag.toDataURL();
-    link.click();
+        const link = document.createElement("a");
+        link.download = "capturedImage.png";
+        link.href = canvasTag.toDataURL();
+        link.click();
     });
 
-    /**
-     *Enviar imagen al serrvidor para se guardada
-    */
     btnSendImageToServer.addEventListener("click", async () => {
-    const dataURL = canvasTag.toDataURL();  // Convertir la imagen a formato Data URL
-    const blob = await dataURLtoBlob(dataURL);  // Convertir Data URL a Blob para el envío
-    const data = new FormData();  // Crear FormData para enviar la imagen al servidor
-    data.append("capturedImage", blob, "capturedImage.png");
+    const dataURL = canvasTag.toDataURL(); // Tomar la imagen del canvas
+    const blob = await dataURLtoBlob(dataURL); // Convertir la imagen a Blob
+    const data = new FormData();
+    data.append("capturedImage", blob, "capturedImage.png"); // Enviar la imagen como 'capturedImage'
 
     try {
         const response = await axios.post("../../controller/upload_foto.php", data, {
             headers: { "Content-Type": "multipart/form-data" },
         });
-        alert(response.data);  // Mostrar el mensaje del servidor
+        alert(response.data); // Mensaje de éxito o error del servidor
     } catch (error) {
-        console.error("Error al enviar la imagen:", error);  // Mostrar cualquier error en la consola
+        console.error("Error al enviar la imagen:", error);
     }
-    });
-
+});
+    // Función para convertir dataURL a Blob
     async function dataURLtoBlob(dataURL) {
-    const arr = dataURL.split(",");
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    const n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    for (let i = 0; i < n; i++) {
-        u8arr[i] = bstr.charCodeAt(i);
-    }
-    return new Blob([u8arr], { type: mime });
+        const arr = dataURL.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        const n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        for (let i = 0; i < n; i++) {
+            u8arr[i] = bstr.charCodeAt(i);
+        }
+        return new Blob([u8arr], { type: mime });
     }
 </script>

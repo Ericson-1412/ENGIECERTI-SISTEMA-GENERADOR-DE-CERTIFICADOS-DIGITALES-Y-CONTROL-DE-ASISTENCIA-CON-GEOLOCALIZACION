@@ -17,7 +17,7 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["fecha"]; // Fecha de asistencia
             $sub_array[] = $row["hora"]; // Hora de asistencia
             $sub_array[] = $row["latitud"] . ', ' . $row["longitud"]; // Ubicación
-            $sub_array[] = '<img src="../../public/fotos_asistencia/'.$row["foto"].'" width="50" height="50" class="img-thumbnail">'; // Mostrar la foto
+            $sub_array[] = '<img src="../../public/fotos_asistencia/'.$row["foto"].'" width="50" height="50" class="img-thumbnail">';
             $sub_array[] = '<button type="button" onClick="editar('.$row["id_asistencia"].');" id="'.$row["id_asistencia"].'" class="btn btn-outline-warning btn-icon"><i class="fa fa-edit"></i></button>';
             $sub_array[] = '<button type="button" onClick="eliminar('.$row["id_asistencia"].');" id="'.$row["id_asistencia"].'" class="btn btn-outline-danger btn-icon"><i class="fa fa-times"></i></button>';
     
@@ -34,30 +34,48 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         break;
 
-
-
     case "guardaryeditar":
-        if (empty($_POST["id_asistencia"])) {
-                // Si el id_asistencia está vacío, inserta una nueva asistencia
-            $asistencia->insert_asistencia(
-                $_POST["usu_id"],
-                $_POST["fecha"],
-                $_POST["foto"],
-                 $_POST["latitud"],
-                $_POST["longitud"]
-            );
-        } else {
-                // Si el id_asistencia tiene valor, actualiza la asistencia existente
-            $asistencia->update_asistencia(
-                $_POST["id_asistencia"],
-                $_POST["usu_id"],
-                $_POST["fecha"],
-                $_POST["foto"],
-                $_POST["latitud"],
-                $_POST["longitud"]
-            );
-        }
-        break;
+            // Subir la foto si existe
+            $foto = '';
+            if (isset($_FILES['foto']) && !empty($_FILES['foto']['tmp_name'])) {
+                $uploadDirectory = '../public/fotos_asistencia/'; // Asegúrate de que esta ruta sea correcta
+                $uploadedFile = $_FILES['foto']['tmp_name'];
+                $extension = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+                $newFileName = uniqid() . '.' . $extension;
+                $destination = $uploadDirectory . $newFileName;
+                
+                if (move_uploaded_file($uploadedFile, $destination)) {
+                    $foto = $newFileName; // Guardar el nombre del archivo para usarlo en la base de datos
+                }
+            }
+        
+            // Aquí continua el código para guardar los demás datos
+            if (empty($_POST["id_asistencia"])) {
+                $hora_actual = date("H:i:s");  // Captura la hora actual en el backend
+                
+                // Insertar la nueva asistencia, pasando la foto guardada
+                $asistencia->insert_asistencia(
+                    $_POST["usu_id"],
+                    $_POST["fecha"],
+                    $foto, // La foto guardada o vacía si no se subió
+                    $_POST["latitud"],
+                    $_POST["longitud"],
+                    $_POST["hora"]
+                );
+            } else {
+                // Actualizar asistencia existente
+                $asistencia->update_asistencia(
+                    $_POST["id_asistencia"],
+                    $_POST["usu_id"],
+                    $_POST["fecha"],
+                    $foto, // La foto guardada o vacía si no se subió
+                    $_POST["latitud"],
+                    $_POST["longitud"],
+                    $_POST["hora"] // La hora recibida del front-end
+                );
+            }
+            break;
+        
     
     case "mostrar":
     $datos = $asistencia->get_asistencia_id($_POST["id_asistencia"]);

@@ -9,6 +9,8 @@ function init() {
 function guardaryeditar(e) {
     e.preventDefault();
     var formData = new FormData($("#asistencia_form")[0]);
+    formData.append('usu_id', $('#usu_id').val());   // Captura todos los valores del formulario
+    
     $.ajax({
         url: "../../controller/asistencia.php?op=guardaryeditar",
         type: "POST",
@@ -16,7 +18,7 @@ function guardaryeditar(e) {
         contentType: false,
         processData: false,
         success: function(data) {
-            $('#cursos_data').DataTable().ajax.reload();
+            $('#asistencia_data').DataTable().ajax.reload(); // Recargar la tabla después de insertar
             $("#modalmantenimiento").modal('hide');
 
             Swal.fire({
@@ -30,26 +32,8 @@ function guardaryeditar(e) {
 }
 
 
-function editar(id_asistencia) {
-    $.post("../../controller/asistencia.php?op=mostrar", { id_asistencia: id_asistencia }, function (data) {
-        data = JSON.parse(data);
-        console.log(data);
-        $('#id_asistencia').val(data.id_asistencia);  // ID de la asistencia
-        $('#usu_id').val(data.usu_id);                // ID del usuario
-        $('#fecha').val(data.fecha);                  // Fecha de la asistencia
-        $('#hora').val(data.hora);                    // Hora de la asistencia
-        $('#latitud').val(data.latitud);              // Latitud
-        $('#longitud').val(data.longitud);            // Longitud
-        // Si la foto está almacenada, podrías mostrarla de esta manera:
-        $('#preview_foto').attr('src', '../public/fotos_asistencia/' + data.foto);
-    });
-    $('#lbltitulo').html('Editar Asistencia');
-    $("#modalmantenimiento").modal('show');
-}
-
-
 $(document).ready(function() {
-
+    
     // Capturar la imagen cuando se presiona el botón
     $("#capture-button").click(function (e) {
         e.preventDefault();  // Evita que el formulario se envíe
@@ -145,9 +129,26 @@ function eliminar(id_asistencia) {
 }
 
 function nuevo() {
+    // Cambiar el título del modal
     $('#lbltitulo').html('Nuevo Registro de Asistencia');
-    $("#asistencia_form")[0].reset(); // Limpiar el formulario
-    $(".editar-only").hide(); // Ocultar los campos de edición
+    
+    // Restablecer el formulario
+    $("#asistencia_form")[0].reset(); // Limpiar todos los campos del formulario
+    
+    // Limpiar campos específicos, si es necesario
+    $('#theCanvas').attr('src', ''); // Limpia la imagen del canvas (si se muestra en algún lugar)
+    $('#preview_foto').attr('src', ''); // Limpiar la imagen de vista previa (si la tienes)
+    
+    // Ocultar campos que son solo para edición
+    $(".editar-only").hide(); // Ocultar los campos que solo deben aparecer en modo de edición
+    
+    // Reiniciar botones y valores
+    $('#btnCapture').prop('disabled', true); // Desactivar el botón de captura de foto
+    $('#btnDownloadImage').prop('disabled', true); // Desactivar el botón de descargar imagen
+    $('#btnSendImageToServer').prop('disabled', true); // Desactivar el botón de guardar imagen
+    $('#btnStartCamera').prop('disabled', false); // Habilitar botón para iniciar cámara
+
+    // Mostrar el modal para nuevo registro
     $("#modalmantenimiento").modal('show'); // Mostrar el modal
 }
 
