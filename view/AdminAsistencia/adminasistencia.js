@@ -8,9 +8,17 @@ function init() {
 
 function guardaryeditar(e) {
     e.preventDefault();
+
     var formData = new FormData($("#asistencia_form")[0]);
+
+    // Obtener la imagen del canvas
+    const canvas = document.getElementById("theCanvas");
+    const dataURL = canvas.toDataURL("image/png");
+    const blob = dataURLtoBlob(dataURL); // Convertir la imagen a Blob
+    formData.append('foto', blob, 'capturedImage.png'); // Añadir la imagen al formData
+
     formData.append('usu_id', $('#usu_id').val());   // Captura todos los valores del formulario
-    
+
     $.ajax({
         url: "../../controller/asistencia.php?op=guardaryeditar",
         type: "POST",
@@ -31,6 +39,18 @@ function guardaryeditar(e) {
     });
 }
 
+// Convertir la dataURL en un Blob
+function dataURLtoBlob(dataURL) {
+    const arr = dataURL.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+}
 
 $(document).ready(function() {
     

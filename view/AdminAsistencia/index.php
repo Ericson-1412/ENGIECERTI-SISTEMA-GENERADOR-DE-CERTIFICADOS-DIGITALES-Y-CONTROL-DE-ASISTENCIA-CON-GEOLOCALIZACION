@@ -96,6 +96,7 @@
 
   <?php require_once("../html/MainJs.php"); ?>
   <script type="text/javascript" src="adminasistencia.js"></script>
+  <script type="text/javascript" src="capturarFoto.js"></script>
 </body>
 </html>
 <?php

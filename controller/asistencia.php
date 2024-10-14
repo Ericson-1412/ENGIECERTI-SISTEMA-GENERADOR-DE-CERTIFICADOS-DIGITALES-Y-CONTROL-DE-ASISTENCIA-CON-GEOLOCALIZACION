@@ -34,41 +34,25 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         break;
 
-    case "guardaryeditar":
-            // Subir la foto si existe
-            $foto = '';
-            if (isset($_FILES['foto']) && !empty($_FILES['foto']['tmp_name'])) {
-                $uploadDirectory = '../public/fotos_asistencia/'; // Asegúrate de que esta ruta sea correcta
-                $uploadedFile = $_FILES['foto']['tmp_name'];
-                $extension = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                $newFileName = uniqid() . '.' . $extension;
-                $destination = $uploadDirectory . $newFileName;
-                
-                if (move_uploaded_file($uploadedFile, $destination)) {
-                    $foto = $newFileName; // Guardar el nombre del archivo para usarlo en la base de datos
-                }
-            }
-        
+        case "guardaryeditar":
             // Aquí continua el código para guardar los demás datos
             if (empty($_POST["id_asistencia"])) {
-                $hora_actual = date("H:i:s");  // Captura la hora actual en el backend
-                
-                // Insertar la nueva asistencia, pasando la foto guardada
+                // Si el id_asistencia está vacío, inserta una nueva asistencia
                 $asistencia->insert_asistencia(
                     $_POST["usu_id"],
                     $_POST["fecha"],
-                    $foto, // La foto guardada o vacía si no se subió
+                    $_POST["foto"],  // El nombre de la imagen que se subió
                     $_POST["latitud"],
                     $_POST["longitud"],
                     $_POST["hora"]
                 );
             } else {
-                // Actualizar asistencia existente
+                // Si el id_asistencia tiene valor, actualiza la asistencia existente
                 $asistencia->update_asistencia(
                     $_POST["id_asistencia"],
                     $_POST["usu_id"],
                     $_POST["fecha"],
-                    $foto, // La foto guardada o vacía si no se subió
+                    $_POST["foto"], // La foto guardada o vacía si no se subió
                     $_POST["latitud"],
                     $_POST["longitud"],
                     $_POST["hora"] // La hora recibida del front-end
