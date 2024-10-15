@@ -18,7 +18,7 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["hora"]; // Hora de asistencia
             $sub_array[] = $row["latitud"] . ', ' . $row["longitud"]; // Ubicación
             $sub_array[] = '<img src="../../public/fotos_asistencia/'.$row["foto"].'" width="50" height="50" class="img-thumbnail">';
-            $sub_array[] = '<button type="button" onClick="editar('.$row["id_asistencia"].');" id="'.$row["id_asistencia"].'" class="btn btn-outline-warning btn-icon"><i class="fa fa-edit"></i></button>';
+            $sub_array[] = '<button type="button" onClick="editar('.$row["id_asistencia"].');" id="'.$row["id_asistencia"].'" class="btn btn-outline-info btn-icon"><i class="fa fa-eye"></i></button>';
             $sub_array[] = '<button type="button" onClick="eliminar('.$row["id_asistencia"].');" id="'.$row["id_asistencia"].'" class="btn btn-outline-danger btn-icon"><i class="fa fa-times"></i></button>';
     
             $data[] = $sub_array;

@@ -109,21 +109,6 @@ $(document).ready(function() {
     });
 });
 
-function editar(id_asistencia) {
-    $.post("../../controller/asistencia.php?op=mostrar", { id_asistencia: id_asistencia }, function (data) {
-        data = JSON.parse(data);
-        console.log(data);
-        $('#id_asistencia').val(data.id_asistencia);
-        $('#usu_id').val(data.usu_id); // ID del usuario
-        $('#fecha').val(data.fecha); // Fecha de asistencia
-        $('#foto').val(data.foto); // Foto (puedes ajustar si se trata de mostrar una imagen)
-        $('#latitud').val(data.latitud); // Latitud de la ubicación
-        $('#longitud').val(data.longitud); // Longitud de la ubicación
-    });
-    $('#lbltitulo').html('Editar Asistencia');
-    $("#modalmantenimiento").modal('show');
-}
-
 function eliminar(id_asistencia) {
     swal.fire({
         title: "Eliminar!",
@@ -148,6 +133,47 @@ function eliminar(id_asistencia) {
     });
 }
 
+function editar(id_asistencia) {
+    // Obtener los datos de asistencia por su ID
+    $.post("../../controller/asistencia.php?op=mostrar", { id_asistencia: id_asistencia }, function (data) {
+        data = JSON.parse(data);
+        console.log(data);
+        
+        // Rellenar los campos con los datos recibidos
+        $('#id_asistencia').val(data.id_asistencia);
+        $('#usu_id').val(data.usu_id); // ID del usuario
+        $('#fecha').val(data.fecha); // Fecha de asistencia
+        $('#hora').val(data.fecha);
+        $('#latitud').val(data.latitud); // Latitud de la ubicación
+        $('#longitud').val(data.longitud); // Longitud de la ubicación
+
+        // Mostrar la imagen en lugar del campo de texto de la foto
+        if (data.foto) {
+            // Mostrar la foto almacenada
+            $('#preview_foto').attr('src', '../../public/fotos_asistencia/' + data.foto);
+            $('#preview_foto').show(); // Asegurarse de que se muestre la imagen
+        } else {
+            $('#preview_foto').hide(); // Si no hay imagen, ocultar el campo de imagen
+        }
+
+        // Ocultar la cámara para la edición
+        $('#theVideo').hide(); // Ocultar el video
+        $('#theCanvas').hide(); // Ocultar el canvas
+
+        // Desactivar botones relacionados con la cámara
+        $('#btnCapture').prop('disabled', true);
+        $('#btnDownloadImage').prop('disabled', true);
+        $('#btnSendImageToServer').prop('disabled', true);
+        $('#btnStartCamera').prop('disabled', true); // Iniciar cámara deshabilitado al editar
+    });
+
+    // Cambiar el título del modal
+    $('#lbltitulo').html('Editar Asistencia');
+
+    // Mostrar el modal para editar la asistencia
+    $("#modalmantenimiento").modal('show');
+}
+
 function nuevo() {
     // Cambiar el título del modal
     $('#lbltitulo').html('Nuevo Registro de Asistencia');
@@ -156,20 +182,27 @@ function nuevo() {
     $("#asistencia_form")[0].reset(); // Limpiar todos los campos del formulario
     
     // Limpiar campos específicos, si es necesario
-    $('#theCanvas').attr('src', ''); // Limpia la imagen del canvas (si se muestra en algún lugar)
-    $('#preview_foto').attr('src', ''); // Limpiar la imagen de vista previa (si la tienes)
+    $('#theCanvas')[0].getContext('2d').clearRect(0, 0, $('#theCanvas')[0].width, $('#theCanvas')[0].height); // Limpiar el canvas
+    $('#preview_foto').attr('src', ''); // Limpiar la imagen previa
+    $('#preview_foto').css('display', 'none'); // Ocultar el elemento de la imagen
     
-    // Ocultar campos que son solo para edición
-    $(".editar-only").hide(); // Ocultar los campos que solo deben aparecer en modo de edición
-    
-    // Reiniciar botones y valores
-    $('#btnCapture').prop('disabled', true); // Desactivar el botón de captura de foto
+    // Mostrar de nuevo la cámara para un nuevo registro
+    $('#theVideo').show(); // Mostrar el video
+    $('#theCanvas').show(); // Mostrar el canvas
+
+    // Reiniciar botones relacionados con la cámara y la imagen
+    $('#btnCapture').prop('disabled', false); // Activar el botón de captura de foto
     $('#btnDownloadImage').prop('disabled', true); // Desactivar el botón de descargar imagen
     $('#btnSendImageToServer').prop('disabled', true); // Desactivar el botón de guardar imagen
     $('#btnStartCamera').prop('disabled', false); // Habilitar botón para iniciar cámara
 
+    // Limpiar campos de latitud, longitud y hora
+    $('#latitud').val(''); // Limpiar el campo de latitud
+    $('#longitud').val(''); // Limpiar el campo de longitud
+    $('#hora').val(''); // Limpiar el campo de hora
+
     // Mostrar el modal para nuevo registro
-    $("#modalmantenimiento").modal('show'); // Mostrar el modal
+    $("#modalmantenimiento").modal('show');
 }
 
 init();

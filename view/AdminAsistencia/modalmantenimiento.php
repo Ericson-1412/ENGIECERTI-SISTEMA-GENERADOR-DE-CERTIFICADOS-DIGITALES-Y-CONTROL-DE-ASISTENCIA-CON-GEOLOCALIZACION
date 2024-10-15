@@ -19,6 +19,7 @@
                             <video id="theVideo" autoplay muted></video>
                             <canvas id="theCanvas"></canvas> <!-- Mantener oculto el canvas -->
                         </div>
+                        <img id="preview_foto" src="" width="300" height="300" class="img-thumbnail" style="display: none;">
                         <div class="d-grid gap-2 d-md-block">
                             <button type="button" class="btn btn-primary" id="btnCapture">Tomar foto</button>
                             <button type="button" class="btn btn-primary" id="btnDownloadImage" disabled>Descargar Imagen</button>
@@ -26,6 +27,7 @@
                             <button type="button" class="btn btn-primary" id="btnStartCamera">Iniciar Cámara</button>          
                         </div>
                         <br>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="hora">Hora:</label>
