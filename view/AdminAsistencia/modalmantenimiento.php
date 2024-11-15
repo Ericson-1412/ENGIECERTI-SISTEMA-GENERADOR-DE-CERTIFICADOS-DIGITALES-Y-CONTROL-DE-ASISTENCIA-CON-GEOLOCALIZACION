@@ -7,6 +7,7 @@
             <form method="post" id="asistencia_form" enctype="multipart/form-data">
                 <div class="modal-body pd-25">
                     <input type="hidden" name="id_asistencia" id="id_asistencia" />
+                    <input type="hidden" name="usu_id" id="usu_id" value="<?php echo $_SESSION['usu_id']; ?>" />
                     <div class="container">
                         <div class="row">
                             <div class="col-md-6">

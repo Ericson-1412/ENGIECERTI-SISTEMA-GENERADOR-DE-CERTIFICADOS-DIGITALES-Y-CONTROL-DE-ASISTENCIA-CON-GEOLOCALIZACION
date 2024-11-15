@@ -1,7 +1,7 @@
 var usu_id = $('#usu_idx').val();
 
 function init() {
-    $("#asistencia_form").on("submit", function(e) {
+    $("#asistencia_form").off("submit").on("submit", function(e) {
         guardaryeditar(e);
     });
 }
@@ -143,13 +143,12 @@ function editar(id_asistencia) {
         $('#id_asistencia').val(data.id_asistencia);
         $('#usu_id').val(data.usu_id); // ID del usuario
         $('#fecha').val(data.fecha); // Fecha de asistencia
-        $('#hora').val(data.fecha);
+        $('#hora').val(data.hora); // Hora de asistencia
         $('#latitud').val(data.latitud); // Latitud de la ubicación
         $('#longitud').val(data.longitud); // Longitud de la ubicación
 
         // Mostrar la imagen en lugar del campo de texto de la foto
         if (data.foto) {
-            // Mostrar la foto almacenada
             $('#preview_foto').attr('src', '../../public/fotos_asistencia/' + data.foto);
             $('#preview_foto').show(); // Asegurarse de que se muestre la imagen
         } else {
@@ -157,14 +156,14 @@ function editar(id_asistencia) {
         }
 
         // Ocultar la cámara para la edición
-        $('#theVideo').hide(); // Ocultar el video
-        $('#theCanvas').hide(); // Ocultar el canvas
+        $('#theVideo').hide();
+        $('#theCanvas').hide();
 
         // Desactivar botones relacionados con la cámara
         $('#btnCapture').prop('disabled', true);
         $('#btnDownloadImage').prop('disabled', true);
         $('#btnSendImageToServer').prop('disabled', true);
-        $('#btnStartCamera').prop('disabled', true); // Iniciar cámara deshabilitado al editar
+        $('#btnStartCamera').prop('disabled', true);
     });
 
     // Cambiar el título del modal
@@ -173,6 +172,42 @@ function editar(id_asistencia) {
     // Mostrar el modal para editar la asistencia
     $("#modalmantenimiento").modal('show');
 }
+
+// function nuevo() {
+//     // Cambiar el título del modal
+//     $('#lbltitulo').html('Nuevo Registro de Asistencia');
+    
+//     // Restablecer el formulario
+//     $("#asistencia_form")[0].reset(); // Limpiar todos los campos del formulario
+    
+//     // Limpiar campos específicos
+//     $('#theCanvas')[0].getContext('2d').clearRect(0, 0, $('#theCanvas')[0].width, $('#theCanvas')[0].height); // Limpiar el canvas
+//     $('#preview_foto').attr('src', ''); // Limpiar la imagen previa
+//     $('#preview_foto').css('display', 'none'); // Ocultar el elemento de la imagen
+    
+//     // Mostrar de nuevo la cámara para un nuevo registro
+//     $('#theVideo').show(); // Mostrar el video
+//     $('#theCanvas').show(); // Mostrar el canvas
+
+//     // Reiniciar botones relacionados con la cámara y la imagen
+//     $('#btnCapture').prop('disabled', false); // Activar el botón de captura de foto
+//     $('#btnDownloadImage').prop('disabled', true);
+//     $('#btnSendImageToServer').prop('disabled', true);
+//     $('#btnStartCamera').prop('disabled', false); // Habilitar el botón de iniciar la cámara
+
+//     // Limpiar campos de latitud, longitud y hora
+//     $('#latitud').val(''); // Limpiar el campo de latitud
+//     $('#longitud').val(''); // Limpiar el campo de longitud
+//     $('#hora').val(''); // Limpiar el campo de hora
+
+//     // Asegurarse de que no se duplique el evento de submit
+//     $("#asistencia_form").off("submit").on("submit", function(e) {
+//         guardaryeditar(e); // Llamar a la función de guardar
+//     });
+
+//     // Mostrar el modal para nuevo registro
+//     $("#modalmantenimiento").modal('show');
+// }
 
 function nuevo() {
     // Cambiar el título del modal
@@ -183,14 +218,13 @@ function nuevo() {
     
     // Limpiar campos específicos, si es necesario
     $('#theCanvas')[0].getContext('2d').clearRect(0, 0, $('#theCanvas')[0].width, $('#theCanvas')[0].height); // Limpiar el canvas
-    $('#preview_foto').attr('src', ''); // Limpiar la imagen previa
-    $('#preview_foto').css('display', 'none'); // Ocultar el elemento de la imagen
+    $('#preview_foto').attr('src', '').hide(); // Limpiar la imagen previa y ocultarla
     
     // Mostrar de nuevo la cámara para un nuevo registro
     $('#theVideo').show(); // Mostrar el video
     $('#theCanvas').show(); // Mostrar el canvas
 
-    // Reiniciar botones relacionados con la cámara y la imagen
+    // Reiniciar los botones relacionados con la cámara
     $('#btnCapture').prop('disabled', false); // Activar el botón de captura de foto
     $('#btnDownloadImage').prop('disabled', true); // Desactivar el botón de descargar imagen
     $('#btnSendImageToServer').prop('disabled', true); // Desactivar el botón de guardar imagen
@@ -201,8 +235,43 @@ function nuevo() {
     $('#longitud').val(''); // Limpiar el campo de longitud
     $('#hora').val(''); // Limpiar el campo de hora
 
+    // Desvincular cualquier evento anterior de submit para evitar duplicados
+    $("#asistencia_form").off('submit');
+
+    // Registrar el evento submit del formulario nuevamente
+    $("#asistencia_form").on("submit", function(e) {
+        e.preventDefault();
+        var formData = new FormData($("#asistencia_form")[0]);
+        
+        $.ajax({
+            url: "../../controller/asistencia.php?op=guardaryeditar",
+            type: "POST",
+            data: { usu_id: usu_id },
+            contentType: false,
+            processData: false,
+            success: function(data) {
+                console.log("Respuesta del servidor:", data);  // Verifica la respuesta del servidor
+                $('#asistencia_data').DataTable().ajax.reload(); // Recargar la tabla después de insertar
+                $("#modalmantenimiento").modal('hide');
+
+                Swal.fire({
+                    title: 'Correcto!',
+                    text: 'Se Registro Correctamente',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error en el envío de datos: ", textStatus, errorThrown); // Capturar cualquier error en la solicitud AJAX
+            }
+        });
+    });
+
     // Mostrar el modal para nuevo registro
-    $("#modalmantenimiento").modal('show');
+    $("#modalmantenimiento").modal('show'); // Mostrar el modal
 }
+
+
+
 
 init();

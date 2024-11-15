@@ -31,7 +31,13 @@
                         $_SESSION["usu_correo"] = $resultado["usu_correo"];
                         $_SESSION["rol_id"] = $resultado["rol_id"];
                         // Si todo está correcto, redirigimos al home
-                        header("Location:".Conectar::ruta()."view/UsuHome/");
+                        if ($resultado["rol_id"] == 1) {
+                        header("Location:".Conectar::ruta()."view/AdminAsistencia/index2.php");
+                        exit();
+                        } else {
+                            // Redirigir al home si no es estudiante
+                            header("Location:".Conectar::ruta()."view/UsuHome/");
+                        }
                         exit();
                     } else {
                         // Si la contraseña no coincide
