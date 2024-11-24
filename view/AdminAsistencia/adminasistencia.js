@@ -75,6 +75,12 @@ $(document).ready(function() {
         $('#asistencia_data').DataTable({
             "aProcessing": true,
             "aServerSide": true,
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                ],
             "ajax": {
                 url: "../../controller/asistencia.php?op=listar",
                 type: "post",
@@ -133,6 +139,46 @@ function eliminar(id_asistencia) {
     });
 }
 
+let map; // Definir globalmente para que se pueda destruir y recrear
+
+function initMap(lat, lng) {
+    // Verifica si lat y lng son válidos
+    if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+        console.log("Coordenadas: ", lat, lng); // Depuración: Verifica que las coordenadas sean correctas
+        
+        // Si el mapa ya existe, destruirlo antes de crear uno nuevo
+        if (map) {
+            map.remove(); // Eliminar el mapa actual
+        }
+
+        // Crear el mapa centrado en las coordenadas proporcionadas
+        map = L.map('map').setView([lat, lng], 15);  // Usar zoom 15, puedes ajustar el nivel
+
+        // Usar OpenStreetMap como fondo
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Colocar un marcador en las coordenadas
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup("Ubicación de Asistencia")
+            .openPopup();
+
+        // Actualizar los valores de latitud y longitud
+        $('#latitud').val(lat);
+        $('#longitud').val(lng);
+    } else {
+        console.log("Coordenadas no válidas: ", lat, lng); // Depuración si las coordenadas no son válidas
+    }
+
+    // Asegurarse de que el mapa se ajuste correctamente al abrir el modal
+    $('#modalmantenimiento').on('shown.bs.modal', function () {
+        map.invalidateSize();  // Redibuja el mapa para que se ajuste al tamaño del contenedor
+    });
+}
+
+
+
 function editar(id_asistencia) {
     // Obtener los datos de asistencia por su ID
     $.post("../../controller/asistencia.php?op=mostrar", { id_asistencia: id_asistencia }, function (data) {
@@ -144,9 +190,7 @@ function editar(id_asistencia) {
         $('#usu_id').val(data.usu_id); // ID del usuario
         $('#fecha').val(data.fecha); // Fecha de asistencia
         $('#hora').val(data.hora); // Hora de asistencia
-        $('#latitud').val(data.latitud); // Latitud de la ubicación
-        $('#longitud').val(data.longitud); // Longitud de la ubicación
-
+        
         // Mostrar la imagen en lugar del campo de texto de la foto
         if (data.foto) {
             $('#preview_foto').attr('src', '../../public/fotos_asistencia/' + data.foto);
@@ -154,6 +198,11 @@ function editar(id_asistencia) {
         } else {
             $('#preview_foto').hide(); // Si no hay imagen, ocultar el campo de imagen
         }
+
+        // Mostrar el mapa en la edición
+        $('#map').show(); // Mostrar el mapa solo cuando se edite el registro
+        $('#latitud').val(data.latitud); // Latitud de la ubicación
+        $('#longitud').val(data.longitud); // Longitud de la ubicación
 
         // Ocultar la cámara para la edición
         $('#theVideo').hide();
@@ -164,10 +213,13 @@ function editar(id_asistencia) {
         $('#btnDownloadImage').prop('disabled', true);
         $('#btnSendImageToServer').prop('disabled', true);
         $('#btnStartCamera').prop('disabled', true);
+
+        // Inicializar el mapa con las coordenadas de la asistencia
+        initMap(data.latitud, data.longitud);
     });
 
     // Cambiar el título del modal
-    $('#lbltitulo').html('Editar Asistencia');
+    $('#lbltitulo').html('Mostrar Asistencia');
 
     // Mostrar el modal para editar la asistencia
     $("#modalmantenimiento").modal('show');
@@ -219,6 +271,9 @@ function nuevo() {
     // Limpiar campos específicos, si es necesario
     $('#theCanvas')[0].getContext('2d').clearRect(0, 0, $('#theCanvas')[0].width, $('#theCanvas')[0].height); // Limpiar el canvas
     $('#preview_foto').attr('src', '').hide(); // Limpiar la imagen previa y ocultarla
+    
+    // Ocultar el mapa ya que estamos en la vista de nuevo registro
+    $('#map').hide(); // Ocultar el contenedor del mapa
     
     // Mostrar de nuevo la cámara para un nuevo registro
     $('#theVideo').show(); // Mostrar el video

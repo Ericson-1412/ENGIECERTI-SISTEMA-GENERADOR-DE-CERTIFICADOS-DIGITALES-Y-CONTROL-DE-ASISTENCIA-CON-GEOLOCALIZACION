@@ -8,6 +8,7 @@
 <head>
   <?php require_once("../html/MainHead.php"); ?>
   <link rel="stylesheet" href="../../public/css/search.css">
+  <script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap" async defer></script>
   <title>EngieCerti::Control de Asistencia</title>
   <style>
     .img-fluid {

@@ -22,7 +22,7 @@
         <div class="main-content">
             <section class="section">
                 <div class="section-header">
-                    <h1>Cursos</h1>
+                    <h1>Instructores</h1>
                 </div>
                 <div class="section-body">
                     <h2 class="section-title">Mantenimiento Instructor</h2>

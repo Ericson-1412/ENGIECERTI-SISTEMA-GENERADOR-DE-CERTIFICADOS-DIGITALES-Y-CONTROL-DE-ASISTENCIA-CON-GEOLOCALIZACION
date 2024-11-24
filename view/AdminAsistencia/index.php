@@ -9,6 +9,9 @@
   <?php require_once("../html/MainHead.php"); ?>
   <link rel="stylesheet" href="../../public/css/search.css">
   <title>EngieCerti::Control de Asistencia</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap" async defer></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body>
@@ -63,7 +66,7 @@
                                                             <th class="wd-15p">Fecha</th>
                                                             <th class="wd-15p">Hora</th>
                                                             <th class="wd-20p">Ubicación</th>
-                                                            <th class="wd-20p">Foto</th>
+                                                            <th class="wd-20p"></th>
                                                             <th class="wd-10p"></th>
                                                             <th class="wd-10p"></th>
                                                         </tr>

@@ -36,6 +36,9 @@
                             </div>
                         </div>
                         <br>
+                        <!-- Mostrar Mapa en lugar de latitud/longitud como campos -->
+                        <div id="map" style="height: 400px; width: 100%;"></div> <!-- Aquí estará el mapa de OpenStreetMap -->
+                        <br>
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="latitud">Latitud:</label>
@@ -64,3 +67,6 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script type="text/javascript" src="capturarFoto.js"></script>
+<!-- Agrega Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
