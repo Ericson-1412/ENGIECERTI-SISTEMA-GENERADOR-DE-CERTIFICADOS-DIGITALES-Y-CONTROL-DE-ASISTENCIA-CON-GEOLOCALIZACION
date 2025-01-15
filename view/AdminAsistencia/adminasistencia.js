@@ -326,7 +326,4 @@ function nuevo() {
     $("#modalmantenimiento").modal('show'); // Mostrar el modal
 }
 
-
-
-
 init();

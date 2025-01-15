@@ -17,7 +17,7 @@ class Asistencia extends Conectar {
         $sql->execute();
         return $resultado=$sql->fetchAll();
     }
-
+    
     public function update_asistencia($id_asistencia, $usu_id, $fecha, $foto, $latitud, $longitud, $hora) {
         $conectar = parent::conexion();
         parent::set_names();
@@ -108,6 +108,5 @@ class Asistencia extends Conectar {
         
         return $sql->fetchAll();
     }
-    
 }
 ?>
